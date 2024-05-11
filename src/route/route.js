@@ -1,6 +1,7 @@
 const express = require('express');
 const oprConfigApp = require('../config/config');
-const { getAllUser, createUser } = require('../controller/users');
+const { createUser, updateUser, getUser, deleteUser } = require('../controller/users');
+const { loginUser } = require('../controller/auth');
 const route = express.Router();
 
 const routeHandler = async (app) => {
@@ -14,8 +15,11 @@ const routeHandler = async (app) => {
     })
 
     //user start
-    route.get(oprConfigApp.API.getAllUser, getAllUser)
-    route.post(oprConfigApp.API.createUsers, createUser)
+    route.get(oprConfigApp.API.getUser, getUser)
+    route.post(oprConfigApp.API.createUser, createUser)
+    route.post(oprConfigApp.API.updateUser, updateUser)
+    route.post(oprConfigApp.API.loginUser, loginUser)
+    route.post(oprConfigApp.API.deleteUser, deleteUser)
     //user end
 
 

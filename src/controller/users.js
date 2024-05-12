@@ -9,7 +9,7 @@ const getUser = async (req, res) => {
         const token = reqAuthHeader.split(" ")[1]
         if (token === null) {
             fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "token invalid" })
+                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
             })
         }
 
@@ -20,7 +20,7 @@ const getUser = async (req, res) => {
         return res.status(200).send({ ResultCode: 1, data: existingUser.rows })
     } catch (error) {
         console.error("Error:", error);
-        return res.status(500).send({ ResultCode: 0, message: "Internal server error" });
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
     }
 };
 
@@ -33,7 +33,7 @@ const createUser = async (req, res) => {
         const existingUser = await db.query(`SELECT * FROM "users" WHERE email = $1`, [email]);
 
         if (existingUser.rows.length > 0) {
-            return res.status(400).send({ ResultCode: 0, message: "Email is already in use" });
+            return res.status(400).send({ ResultCode: 0, message: "Email Is Already In Use" });
         }
         if (!email || !password) {
             return res.status(400).send({ ResultCode: 0, message: "you must fill email and password" })
@@ -45,7 +45,7 @@ const createUser = async (req, res) => {
         return res.status(200).send({ ResultCode: 1, message: "Data has been create" })
     } catch (error) {
         console.error("Error:", error);
-        return res.status(500).send({ ResultCode: 0, message: "Internal server error" });
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
     }
 };
 
@@ -55,7 +55,7 @@ const updateUser = async (req, res) => {
         const token = reqAuthHeader.split(" ")[1]
         if (token === null) {
             fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "token invalid" })
+                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
             })
         }
 
@@ -68,25 +68,29 @@ const updateUser = async (req, res) => {
             dataUser = existingUser.rows[i];
         }
 
+        if(dataUser === undefined){
+            return res.status(400).send({ ResultCode: 0, message: "User Not Found" })
+        }
+
         const { name = dataUser.name, email = dataUser.email, password = dataUser.password, phone = dataUser.phone, address = dataUser.address } = req.body;
         const comparePassword = await bcrypt.compare(password, dataUser.password)
         if (comparePassword) {
-            return res.status(400).send({ ResultCode: 0, message: "please dont use your last password" })
+            return res.status(400).send({ ResultCode: 0, message: "Please Dont Use Your Last Password" })
         }
 
         if (password != dataUser.password) {
             const hashPassword = await bcrypt.hash(password, 12)
 
             await db.query(`UPDATE users SET name = $1, email = $2, password = $3, phone = $4, address = $5 WHERE user_id = $6`, [name, email, hashPassword, phone, address, userId])
-            return res.status(200).send({ ResultCode: 1, message: "update data success" })
+            return res.status(200).send({ ResultCode: 1, message: "Update data success" })
         } else {
             await db.query(`UPDATE users SET name = $1, email = $2, password = $3, phone = $4, address = $5 WHERE user_id = $6`, [name, email, password, phone, address, userId])
-            return res.status(200).send({ ResultCode: 1, message: "update data success" })
+            return res.status(200).send({ ResultCode: 1, message: "Update data success" })
         }
 
     } catch (error) {
         console.error("Error:", error);
-        return res.status(500).send({ ResultCode: 0, message: "Internal server error" });
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
     }
 }
 
@@ -96,7 +100,7 @@ const deleteUser = async (req, res) => {
         const token = reqAuthHeader.split(" ")[1]
         if (token === null) {
             fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "token invalid" })
+                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
             })
         }
 
@@ -104,11 +108,11 @@ const deleteUser = async (req, res) => {
         const userId = userAccount.id
 
         await db.query(`DELETE FROM "users" WHERE user_id = $1`, [userId])
-        return res.status(200).send({ ResultCode: 1, message: "delete data success" })
+        return res.status(200).send({ ResultCode: 1, message: "Delete data success" })
 
     } catch (error) {
         console.error("Error:", error);
-        return res.status(500).send({ ResultCode: 0, message: "Internal server error" });
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
     }
 }
 

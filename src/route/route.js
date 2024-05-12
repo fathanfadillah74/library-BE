@@ -22,6 +22,10 @@ const routeHandler = async (app) => {
     route.post(oprConfigApp.API.deleteUser, deleteUser)
     //user end
 
+    //books start
+
+    //books end
+
 
     route.use(logger);
 

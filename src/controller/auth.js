@@ -7,7 +7,7 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         const existingUser = await db.query(`SELECT * FROM "users" WHERE email = $1`, [email]);
         if (existingUser.rows.length == 0) {
-            return res.status(400).send({ ResultCode: 0, message: "user not found" })
+            return res.status(400).send({ ResultCode: 0, message: "User Not Found" })
         }
         let dataUser;
         for (let i = 0; i < existingUser.rows.length; i++) {
@@ -15,7 +15,7 @@ const loginUser = async (req, res) => {
         }
         const comparePassword = await bcrypt.compare(password, dataUser.password)
         if (!comparePassword) {
-            return res.status(400).send({ ResultCode: 0, message: "email or password incorrect" })
+            return res.status(400).send({ ResultCode: 0, message: "Email or Password Incorrect" })
         }
 
         const payload = {
@@ -32,7 +32,7 @@ const loginUser = async (req, res) => {
 
     } catch (error) {
         console.error("Error:", error);
-        return res.status(500).send({ ResultCode: 0, message: "Internal server error" });
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
     }
 }
 

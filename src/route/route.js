@@ -1,6 +1,7 @@
 const express = require('express');
 const oprConfigApp = require('../config/config');
 const { createUser, updateUser, getUser, deleteUser } = require('../controller/users');
+const { saveBook, getAllBooks } = require('../controller/books');
 const { loginUser } = require('../controller/auth');
 const route = express.Router();
 
@@ -23,7 +24,8 @@ const routeHandler = async (app) => {
     //user end
 
     //books start
-
+    route.get(oprConfigApp.API.getAllBooks, getAllBooks)
+    route.post(oprConfigApp.API.saveBook, saveBook)
     //books end
 
 

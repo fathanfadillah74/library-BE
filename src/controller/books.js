@@ -51,7 +51,7 @@ const createBook = async (req, res) => {
 };
 
 const saveBook = async (req, res) => {
-    const reqBook = 'one+piece';
+    const reqBook = req.body;
     const url = `${oprConfigApp.API.googleAPI.baseUrl}` + 'q=' + `${reqBook}` + '&' + `${oprConfigApp.API.googleAPI.key}`;
 
     https.get(url, async (response) => {

@@ -2,6 +2,8 @@ const https = require('https');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../config/db');
 const oprConfigApp = require('../config/config');
+const { jwtDecode } = require("jwt-decode");
+
 
 const getAllBooks = async (req, res) => {
     try {
@@ -100,10 +102,41 @@ const saveBook = async (req, res) => {
     });
 };
 
+const createWishlist = async (req, res) => {
+    try {
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
+        }
+
+        const userAccount = jwtDecode(token)
+        const userId = userAccount.id
+
+        const wishlistQuery = `
+            SELECT w.wishlist_id, b.title, w.date_added
+            FROM wishlist w
+            JOIN books b ON w.book_id = b.book_id
+            WHERE w.user_id = $1
+        `;
+
+        const { rows } = await db.query(wishlistQuery, [userId]);
+
+        return res.status(200).send({ ResultCode: 1, data: rows });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
+    }
+};
 
 module.exports = {
     getAllBooks,
     // getBook,
     createBook,
-    saveBook
+    saveBook,
+    createWishlist
 };

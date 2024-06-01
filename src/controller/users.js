@@ -53,12 +53,14 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const reqAuthHeader = req.headers.authorization
-        const token = reqAuthHeader.split(" ")[1]
-        if (token === null) {
-            fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
-            })
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
         }
 
         const userAccount = jwtDecode(token)
@@ -75,10 +77,6 @@ const updateUser = async (req, res) => {
         }
 
         const { name = dataUser.name, email = dataUser.email, password = dataUser.password, phone = dataUser.phone, address = dataUser.address } = req.body;
-        const comparePassword = await bcrypt.compare(password, dataUser.password)
-        if (comparePassword) {
-            return res.status(400).send({ ResultCode: 0, message: "Please Dont Use Your Last Password" })
-        }
 
         if (password != dataUser.password) {
             const hashPassword = await bcrypt.hash(password, 12)
@@ -98,12 +96,14 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const reqAuthHeader = req.headers.authorization
-        const token = reqAuthHeader.split(" ")[1]
-        if (token === null) {
-            fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
-            })
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
         }
 
         const userAccount = jwtDecode(token)

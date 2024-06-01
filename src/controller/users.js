@@ -5,12 +5,14 @@ const { jwtDecode } = require("jwt-decode");
 
 const getUser = async (req, res) => {
     try {
-        const reqAuthHeader = req.headers.authorization
-        const token = reqAuthHeader.split(" ")[1]
-        if (token === null) {
-            fastify.jwt.verify(token, 'secret_key', () => {
-                return res.code(400).send({ ResultCode: 0, message: "Token Invalid" })
-            })
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
         }
 
         const userAccount = jwtDecode(token)

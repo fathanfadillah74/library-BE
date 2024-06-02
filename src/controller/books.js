@@ -53,7 +53,7 @@ const createBook = async (req, res) => {
 };
 
 const saveBook = async (req, res) => {
-    const reqBook = req.body;
+    const reqBook = req.body.query;
     const url = `${oprConfigApp.API.googleAPI.baseUrl}` + 'q=' + `${reqBook}` + '&' + `${oprConfigApp.API.googleAPI.key}`;
 
     https.get(url, async (response) => {
@@ -114,11 +114,48 @@ const createWishlist = async (req, res) => {
             return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
         }
 
-        const userAccount = jwtDecode(token)
-        const userId = userAccount.id
+        const userAccount = jwtDecode(token);
+        const userId = userAccount.id;
+        const wishlistId = uuidv4();
+
+        const { book_id } = req.body;
+        if (!book_id) {
+            return res.status(400).send({ ResultCode: 0, message: "Book ID is missing" });
+        }
+
+        // Insert into wishlist
+        const insertQuery = `
+            INSERT INTO wishlist (wishlist_id, user_id, book_id, date_added)
+            VALUES ($1, $2, $3, NOW())
+            RETURNING wishlist_id, user_id, book_id, date_added
+        `;
+
+        const { rows } = await db.query(insertQuery, [wishlistId, userId, book_id]);
+
+        return res.status(200).send({ ResultCode: 1, message: "Book added to wishlist", data: rows[0] });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
+    }
+};
+
+const getWishlist = async (req, res) => {
+    try {
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
+        }
+
+        const userAccount = jwtDecode(token);
+        const userId = userAccount.id;
 
         const wishlistQuery = `
-            SELECT w.wishlist_id, b.title, w.date_added
+            SELECT w.wishlist_id, b.title, b.thumbnail, b.authors,b.preview_link, w.date_added
             FROM wishlist w
             JOIN books b ON w.book_id = b.book_id
             WHERE w.user_id = $1
@@ -126,7 +163,41 @@ const createWishlist = async (req, res) => {
 
         const { rows } = await db.query(wishlistQuery, [userId]);
 
-        return res.status(200).send({ ResultCode: 1, data: rows });
+        return res.status(200).send({ ResultCode: 1, message: "Wishlist retrieved successfully", data: rows });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
+    }
+};
+
+const deleteWishlist = async (req, res) => {
+    try {
+        const reqAuthHeader = req.headers.authorization;
+        if (!reqAuthHeader) {
+            return res.status(400).send({ ResultCode: 0, message: "Authorization header is missing" });
+        }
+
+        const token = reqAuthHeader.split(" ")[1];
+        if (!token) {
+            return res.status(400).send({ ResultCode: 0, message: "Token is missing" });
+        }
+
+        const userAccount = jwtDecode(token);
+        const userId = userAccount.id;
+        const { wishlist_id } = req.body;
+        if (!wishlist_id) {
+            return res.status(400).send({ ResultCode: 0, message: "Wishlist ID is missing" });
+        }
+
+        // Delete from wishlist
+        const deleteQuery = `
+            DELETE FROM wishlist
+            WHERE wishlist_id = $1 AND user_id = $2
+        `;
+
+        await db.query(deleteQuery, [wishlist_id, userId]);
+
+        return res.status(200).send({ ResultCode: 1, message: "Wishlist deleted successfully" });
     } catch (error) {
         console.error("Error:", error);
         return res.status(500).send({ ResultCode: 0, message: "Internal Server Error" });
@@ -138,5 +209,7 @@ module.exports = {
     // getBook,
     createBook,
     saveBook,
-    createWishlist
+    createWishlist,
+    getWishlist,
+    deleteWishlist
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const oprConfigApp = require('../config/config');
 const { createUser, updateUser, getUser, deleteUser } = require('../controller/users');
-const { saveBook, getAllBooks, createWishlist } = require('../controller/books');
+const { saveBook, getAllBooks, createWishlist, getWishlist, deleteWishlist } = require('../controller/books');
 const { loginUser } = require('../controller/auth');
 const route = express.Router();
 
@@ -26,8 +26,13 @@ const routeHandler = async (app) => {
     //books start
     route.get(oprConfigApp.API.getAllBooks, getAllBooks)
     route.post(oprConfigApp.API.saveBook, saveBook)
-    route.post(oprConfigApp.API.createWishlist, createWishlist)
     //books end
+    
+    //wishlist start
+    route.post(oprConfigApp.API.createWishlist, createWishlist)
+    route.get(oprConfigApp.API.getWishlist, getWishlist)
+    route.delete(oprConfigApp.API.deleteWishlist, deleteWishlist)
+    //wishlist end
 
 
     route.use(logger);

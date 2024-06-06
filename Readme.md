@@ -8,28 +8,40 @@ Aplikasi Backend ini dibangun dengan menggunakan Express.js sebagai server dan m
 ### Prasyarat
 Pastikan Anda sudah menginstall Node.js dan npm. Pastikan juga Anda memiliki akses ke database PostgreSQL.
 
-### Langkah-langkah
+## Langkah Langkah Instalasi
+
 1. Clone repositori ini:
     ```sh
-    git clone <repository-url>
+    git clone https://github.com/username/myproject.git
+    cd myproject/BE
     ```
-2. Masuk ke direktori proyek:
-    ```sh
-    cd backend_final
-    ```
-3. Install dependencies:
+
+2. Instal dependencies:
     ```sh
     npm install
     ```
-4. Konfigurasi database di file `.env` (jika diperlukan).
-5. Untuk menjalankan aplikasi di mode produksi:
-    ```sh
-    npm start
+
+3. Buat file `.env` di folder BE dengan isi sebagai berikut:
+    ```env
+    DB_HOST=localhost
+    DB_USER=your_username
+    DB_PASSWORD=your_password
+    DB_NAME=your_database
+    DB_PORT=5432
+    PORT=2000
     ```
-6. Untuk menjalankan aplikasi di mode pengembangan dengan hot-reload:
+
+4. Jalankan aplikasi:
     ```sh
     npm run dev
     ```
+
+## Migrasi Database
+
+Jalankan skrip migrasi untuk membuat tabel di database:
+
+```sh
+node migrate.js
 
 ## Fitur
 - **Login menggunakan JWT**: Endpoint untuk login menggunakan JSON Web Token untuk otentikasi.

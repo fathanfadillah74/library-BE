@@ -1,7 +1,13 @@
 const oprConfigApp = {
     port: 3000,
-    // AppID: process.env.BEFastify || 'BE-Fastify',
-    // DataBase: process.env.DATABASE || "postgresql://postgres:kenari01@localhost:5432/BE-Fastify?schema=public",
+    AppID: process.env.BEFastify || 'BE-Fastify',
+    database: {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        name: process.env.DB_NAME,
+        port: process.env.DB_PORT || 5432
+    },
     API: {
         googleAPI: {
             baseUrl: 'https://www.googleapis.com/books/v1/volumes?',

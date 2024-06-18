@@ -4,7 +4,7 @@ const config = require('./config');
 const pool = new Pool({
   host: config.database.host,
   user: config.database.user,
-  password: config.database.password,
+  password: config.database.password || "kenari01",
   database: config.database.name,
   port: config.database.port
 })
@@ -41,13 +41,13 @@ const createTablesQuery = `
 
 const runMigrations = async () => {
   try {
-    await client.connect();
-    await client.query(createTablesQuery);
+    await pool.connect();
+    await pool.query(createTablesQuery);
     console.log('Migrasi berhasil dijalankan!');
   } catch (error) {
     console.error('Error menjalankan migrasi:', error);
   } finally {
-    await client.end();
+    await pool.end();
   }
 };
 

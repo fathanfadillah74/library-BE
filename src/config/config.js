@@ -1,3 +1,4 @@
+require('dotenv').config();
 const oprConfigApp = {
     port: 3000,
     AppID: process.env.BEFastify || 'BE-Fastify',
